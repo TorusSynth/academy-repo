@@ -1,0 +1,48 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-test-build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Check out the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Node.js environment
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: npm install
+
+    # Step 4: Lint the code
+    - name: Lint code
+      run: npm run lint
+
+    # Step 5: Run tests
+    - name: Run tests
+      run: npm test
+
+    # Step 6: Build the project (if applicable)
+    - name: Build project
+      run: npm run build
+
+    # Step 7: Deploy (GitHub Pages, optional)
+    - name: Deploy to GitHub Pages
+      if: success()  # Only run if all previous steps succeed
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist  # Replace with the directory where your build output resides
